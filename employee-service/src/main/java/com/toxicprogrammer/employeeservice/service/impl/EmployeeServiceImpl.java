@@ -2,6 +2,7 @@ package com.toxicprogrammer.employeeservice.service.impl;
 
 import com.toxicprogrammer.employeeservice.dto.EmployeeDto;
 import com.toxicprogrammer.employeeservice.entity.Employee;
+import com.toxicprogrammer.employeeservice.exception.ResourceNotFoundException;
 import com.toxicprogrammer.employeeservice.mapper.EmployeeMapper;
 import com.toxicprogrammer.employeeservice.repository.EmployeeRepository;
 import com.toxicprogrammer.employeeservice.service.EmployeeService;
@@ -34,7 +35,9 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public EmployeeDto getEmployeeById(Long employeeId) {
-        Employee employee = employeeRepository.findById(employeeId).get();
+        Employee employee = employeeRepository.findById(employeeId).orElseThrow(
+                () -> new ResourceNotFoundException("Employee","id",employeeId)
+        );
 
 //      Convert employee JPA entity to employee dto
         EmployeeDto employeeDto = EmployeeMapper.MAPPER.mapToEmployeeDto(employee);
