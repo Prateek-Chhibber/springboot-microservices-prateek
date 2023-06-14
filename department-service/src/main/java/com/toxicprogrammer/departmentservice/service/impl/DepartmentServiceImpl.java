@@ -2,6 +2,7 @@ package com.toxicprogrammer.departmentservice.service.impl;
 
 import com.toxicprogrammer.departmentservice.dto.DepartmentDto;
 import com.toxicprogrammer.departmentservice.entity.Department;
+import com.toxicprogrammer.departmentservice.mapper.DepartmentMapper;
 import com.toxicprogrammer.departmentservice.repository.DepartmentRepository;
 import com.toxicprogrammer.departmentservice.service.DepartmentService;
 import lombok.AllArgsConstructor;
@@ -19,13 +20,13 @@ public class DepartmentServiceImpl implements DepartmentService {
     @Override
     public DepartmentDto saveDepartment(DepartmentDto departmentDto) {
 //        Convert department DTO to department JPA Entity.
-        Department department = modelMapper.map(departmentDto, Department.class);
+        Department department = DepartmentMapper.MAPPER.mapToDepartment(departmentDto);
 
 //        Store department JPA entity object into database by using save()
         Department savedDepartment = departmentRepository.save(department);
 
 //        Converted savedDepartment JPA entity object into DepartmentDto and return DepartmentDto object i.e. savedDepartmentDto
-        DepartmentDto savedDepartmentDto = modelMapper.map(savedDepartment, DepartmentDto.class);
+        DepartmentDto savedDepartmentDto = DepartmentMapper.MAPPER.mapToDepartmentDto(savedDepartment);
 
         return savedDepartmentDto;
     }
@@ -36,7 +37,7 @@ public class DepartmentServiceImpl implements DepartmentService {
         Department department = departmentRepository.findByDepartmentCode(departmentCode);
 
 //        Convert department JPA entity to department dto
-        DepartmentDto departmentDto = modelMapper.map(department, DepartmentDto.class);
+        DepartmentDto departmentDto = DepartmentMapper.MAPPER.mapToDepartmentDto(department);
 
         return departmentDto;
     }

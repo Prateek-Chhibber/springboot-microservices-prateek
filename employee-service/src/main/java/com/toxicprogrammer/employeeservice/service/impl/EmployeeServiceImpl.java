@@ -2,6 +2,7 @@ package com.toxicprogrammer.employeeservice.service.impl;
 
 import com.toxicprogrammer.employeeservice.dto.EmployeeDto;
 import com.toxicprogrammer.employeeservice.entity.Employee;
+import com.toxicprogrammer.employeeservice.mapper.EmployeeMapper;
 import com.toxicprogrammer.employeeservice.repository.EmployeeRepository;
 import com.toxicprogrammer.employeeservice.service.EmployeeService;
 import lombok.AllArgsConstructor;
@@ -20,13 +21,13 @@ public class EmployeeServiceImpl implements EmployeeService {
     public EmployeeDto saveEmployee(EmployeeDto employeeDto) {
 
 //      Convert employee dto to employee JPA entity
-        Employee employee = modelMapper.map(employeeDto, Employee.class);
+        Employee employee = EmployeeMapper.MAPPER.mapToEmployee(employeeDto);
 
 //      Store employee JPA entity object into database by using save()
         Employee savedEmployee = employeeRepository.save(employee);
 
 //       Convert employee JPA entity to employee dto
-        EmployeeDto savedEmployeeDto = modelMapper.map(savedEmployee, EmployeeDto.class);
+        EmployeeDto savedEmployeeDto = EmployeeMapper.MAPPER.mapToEmployeeDto(savedEmployee);
 
         return savedEmployeeDto;
     }
@@ -36,7 +37,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee = employeeRepository.findById(employeeId).get();
 
 //      Convert employee JPA entity to employee dto
-        EmployeeDto employeeDto = modelMapper.map(employee,EmployeeDto.class);
+        EmployeeDto employeeDto = EmployeeMapper.MAPPER.mapToEmployeeDto(employee);
         return employeeDto;
     }
 }
