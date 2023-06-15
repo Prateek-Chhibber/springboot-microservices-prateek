@@ -1,20 +1,22 @@
 package com.toxicprogrammer.employeeservice.service.impl;
 
+import com.toxicprogrammer.employeeservice.dto.APIResponseDto;
+import com.toxicprogrammer.employeeservice.dto.DepartmentDto;
 import com.toxicprogrammer.employeeservice.dto.EmployeeDto;
 import com.toxicprogrammer.employeeservice.entity.Employee;
-import com.toxicprogrammer.employeeservice.exception.ResourceNotFoundException;
 import com.toxicprogrammer.employeeservice.mapper.EmployeeMapper;
 import com.toxicprogrammer.employeeservice.repository.EmployeeRepository;
 import com.toxicprogrammer.employeeservice.service.EmployeeService;
 import lombok.AllArgsConstructor;
-import org.modelmapper.ModelMapper;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
-    private ModelMapper modelMapper;
+    private RestTemplate restTemplate;
 
     private EmployeeRepository employeeRepository;
 
@@ -34,13 +36,21 @@ public class EmployeeServiceImpl implements EmployeeService {
     }
 
     @Override
-    public EmployeeDto getEmployeeById(Long employeeId) {
-        Employee employee = employeeRepository.findById(employeeId).orElseThrow(
-                () -> new ResourceNotFoundException("Employee","id",employeeId)
-        );
+    public APIResponseDto getEmployeeById(Long employeeId) {
+        Employee employee = employeeRepository.findById(employeeId).get();
+
+        ResponseEntity<DepartmentDto> responseEntity = restTemplate.getForEntity("http://localhost:8080/api/departments/"+employee.getDepartmentCode(),
+                DepartmentDto.class);
+
+        DepartmentDto departmentDto = responseEntity.getBody();
 
 //      Convert employee JPA entity to employee dto
         EmployeeDto employeeDto = EmployeeMapper.MAPPER.mapToEmployeeDto(employee);
-        return employeeDto;
+
+        APIResponseDto apiResponseDto = new APIResponseDto();
+        apiResponseDto.setEmployeeDto(employeeDto);
+        apiResponseDto.setDepartmentDto(departmentDto);
+
+        return apiResponseDto;
     }
 }
