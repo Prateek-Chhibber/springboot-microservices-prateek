@@ -6,6 +6,7 @@ import com.toxicprogrammer.employeeservice.dto.EmployeeDto;
 import com.toxicprogrammer.employeeservice.entity.Employee;
 import com.toxicprogrammer.employeeservice.mapper.EmployeeMapper;
 import com.toxicprogrammer.employeeservice.repository.EmployeeRepository;
+import com.toxicprogrammer.employeeservice.service.APIClient;
 import com.toxicprogrammer.employeeservice.service.EmployeeService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -17,9 +18,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @AllArgsConstructor
 public class EmployeeServiceImpl implements EmployeeService {
 
-//    private RestTemplate restTemplate;
-
-    private WebClient webClient;
+    private APIClient apiClient;
 
     private EmployeeRepository employeeRepository;
 
@@ -42,16 +41,7 @@ public class EmployeeServiceImpl implements EmployeeService {
     public APIResponseDto getEmployeeById(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId).get();
 
-//        ResponseEntity<DepartmentDto> responseEntity = restTemplate.getForEntity("http://localhost:8080/api/departments/"+employee.getDepartmentCode(),
-//                DepartmentDto.class);
-//
-//        DepartmentDto departmentDto = responseEntity.getBody();
-
-        DepartmentDto departmentDto = webClient.get()
-                .uri("http://localhost:8080/api/departments/"+employee.getDepartmentCode())
-                .retrieve()
-                .bodyToMono(DepartmentDto.class)
-                .block();
+        DepartmentDto departmentDto = apiClient.getDepartment(employee.getDepartmentCode());
 
 //      Convert employee JPA entity to employee dto
         EmployeeDto employeeDto = new EmployeeDto(
