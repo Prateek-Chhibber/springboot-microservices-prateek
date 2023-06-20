@@ -19,6 +19,7 @@ public class DepartmentServiceImpl implements DepartmentService {
 
     @Override
     public DepartmentDto saveDepartment(DepartmentDto departmentDto) {
+
 //        Convert department DTO to department JPA Entity.
         Department department = DepartmentMapper.MAPPER.mapToDepartment(departmentDto);
 
