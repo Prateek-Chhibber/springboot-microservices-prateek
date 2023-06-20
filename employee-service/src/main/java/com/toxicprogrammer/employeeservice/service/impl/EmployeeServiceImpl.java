@@ -3,6 +3,7 @@ package com.toxicprogrammer.employeeservice.service.impl;
 import com.toxicprogrammer.employeeservice.dto.APIResponseDto;
 import com.toxicprogrammer.employeeservice.dto.DepartmentDto;
 import com.toxicprogrammer.employeeservice.dto.EmployeeDto;
+import com.toxicprogrammer.employeeservice.dto.OrganizationDto;
 import com.toxicprogrammer.employeeservice.entity.Employee;
 import com.toxicprogrammer.employeeservice.mapper.EmployeeMapper;
 import com.toxicprogrammer.employeeservice.repository.EmployeeRepository;
@@ -19,6 +20,8 @@ import org.springframework.web.reactive.function.client.WebClient;
 public class EmployeeServiceImpl implements EmployeeService {
 
     private APIClient apiClient;
+
+    private WebClient webClient;
 
     private EmployeeRepository employeeRepository;
 
@@ -41,7 +44,21 @@ public class EmployeeServiceImpl implements EmployeeService {
     public APIResponseDto getEmployeeById(Long employeeId) {
         Employee employee = employeeRepository.findById(employeeId).get();
 
-        DepartmentDto departmentDto = apiClient.getDepartment(employee.getDepartmentCode());
+//        DepartmentDto departmentDto = apiClient.getDepartment(employee.getDepartmentCode());
+
+        DepartmentDto departmentDto = webClient.get()
+                .uri("http://localhost:8080/api/departments/" + employee.getDepartmentCode())
+                .retrieve()
+                .bodyToMono(DepartmentDto.class)
+                .block();
+
+        //  DepartmentDto departmentDto = apiClient.getDepartment(employee.getDepartmentCode());
+
+        OrganizationDto organizationDto = webClient.get()
+                .uri("http://localhost:8083/api/organizations/" + employee.getOrganizationCode())
+                .retrieve()
+                .bodyToMono(OrganizationDto.class)
+                .block();
 
 //      Convert employee JPA entity to employee dto
         EmployeeDto employeeDto = new EmployeeDto(
@@ -49,14 +66,15 @@ public class EmployeeServiceImpl implements EmployeeService {
                 employee.getFirstName(),
                 employee.getLastName(),
                 employee.getEmail(),
-                employee.getDepartmentCode()
+                employee.getDepartmentCode(),
+                employee.getOrganizationCode()
 
         );
 
         APIResponseDto apiResponseDto = new APIResponseDto();
         apiResponseDto.setEmployeeDto(employeeDto);
         apiResponseDto.setDepartmentDto(departmentDto);
-
+        apiResponseDto.setOrganizationDto(organizationDto);
         return apiResponseDto;
     }
 }
